@@ -1,4 +1,4 @@
-im { PropsWithChildren, useState } from 'react';
+imp { PropsWithChildren, useState } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
