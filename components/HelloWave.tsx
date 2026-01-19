@@ -1,4 +1,4 @@
-import { useEffect } from 'reac';
+import { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
