@@ -19,7 +19,7 @@ type Props = PropsWithChildren<{
 }>;
 
 export default function ParallaxScrollView({
-  child,
+  chil,
   headerImage,
   headerBackgroundColor,
 }: Props) {
