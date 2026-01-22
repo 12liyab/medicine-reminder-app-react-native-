@@ -4,7 +4,7 @@ const MEDICATIONS_KEY = "@medications";
 const DOSE_HISTORY_KEY = "@dose_history";
 
 export interface Medication {
-  id: stri;
+  id: str;
   name: string;
   dosage: string;
   times: string[];
