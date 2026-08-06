@@ -25,6 +25,35 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+## API configuration
+
+1. Copy `.env.example` to `.env.local`.
+2. Set `EXPO_PUBLIC_API_URL` to the base URL of your API.
+3. Restart Expo after changing environment variables:
+
+   ```bash
+   npx expo start --go --clear
+   ```
+
+When testing on a physical phone, `localhost` points to the phone itself. Use the
+computer's LAN IP address, such as `http://192.168.1.100:3000/api`.
+
+Use the typed client from `services/api.ts`:
+
+```ts
+import { api } from '@/services/api';
+
+type User = { id: string; name: string };
+
+const user = await api.get<User>('/users/123');
+const created = await api.post<User, { name: string }>('/users', {
+  name: 'Ada',
+});
+```
+
+The client supports query parameters, bearer tokens, request cancellation,
+15-second timeouts, JSON parsing, and structured `ApiError` failures.
+
 ## Get a fresh project
 
 When you're ready, run:

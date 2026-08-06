@@ -1,19 +1,48 @@
-import * as Notifications from "expo-notifications";
+import Constants, { ExecutionEnvironment } from "expo-constants";
 import { Platform } from "react-native";
 import { Medication } from "./storage";
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
+type NotificationsModule = typeof import("expo-notifications");
 
-export async function registerForPushNotificationsAsync(): Promise<
-  string | null
-> {
-  let token: string | null = null;
+const isExpoGo =
+  Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+
+let notificationsModulePromise: Promise<NotificationsModule> | undefined;
+let notificationHandlerConfigured = false;
+
+async function getNotificationsAsync(): Promise<NotificationsModule | null> {
+  if (isExpoGo) return null;
+
+  notificationsModulePromise ??= import("expo-notifications");
+  const Notifications = await notificationsModulePromise;
+
+  if (!notificationHandlerConfigured) {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+      }),
+    });
+    notificationHandlerConfigured = true;
+  }
+
+  return Notifications;
+}
+
+export async function registerForNotificationsAsync(): Promise<boolean> {
+  const Notifications = await getNotificationsAsync();
+  if (!Notifications) return false;
+
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "Medication reminders",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#1a8e2d",
+    });
+  }
 
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
@@ -24,27 +53,10 @@ export async function registerForPushNotificationsAsync(): Promise<
   }
 
   if (finalStatus !== "granted") {
-    return null;
+    return false;
   }
 
-  try {
-    const response = await Notifications.getExpoPushTokenAsync();
-    token = response.data;
-
-    if (Platform.OS === "android") {
-      await Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#1a8e2d",
-      });
-    }
-
-    return token;
-  } catch (error) {
-    console.error("Error getting push token:", error);
-    return null;
-  }
+  return true;
 }
 
 export async function scheduleMedicationReminder(
@@ -53,6 +65,9 @@ export async function scheduleMedicationReminder(
   if (!medication.reminderEnabled) return;
 
   try {
+    const Notifications = await getNotificationsAsync();
+    if (!Notifications) return;
+
     // Schedule notifications for each time
     for (const time of medication.times) {
       const [hours, minutes] = time.split(":").map(Number);
@@ -71,9 +86,10 @@ export async function scheduleMedicationReminder(
           data: { medicationId: medication.id },
         },
         trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DAILY,
+          channelId: "default",
           hour: hours,
           minute: minutes,
-          repeats: true,
         },
       });
 
@@ -91,6 +107,9 @@ export async function scheduleRefillReminder(
   if (!medication.refillReminder) return;
 
   try {
+    const Notifications = await getNotificationsAsync();
+    if (!Notifications) return;
+
     // Schedule a notification when supply is low
     if (medication.currentSupply <= medication.refillAt) {
       const identifier = await Notifications.scheduleNotificationAsync({
@@ -114,6 +133,9 @@ export async function cancelMedicationReminders(
   medicationId: string
 ): Promise<void> {
   try {
+    const Notifications = await getNotificationsAsync();
+    if (!Notifications) return;
+
     const scheduledNotifications =
       await Notifications.getAllScheduledNotificationsAsync();
 

@@ -437,7 +437,7 @@ export default function AddMedicationScreen() {
                   <View>
                     <Text style={styles.switchLabel}>Reminders</Text>
                     <Text style={styles.switchSubLabel}>
-                      Get notified when it's time to take your medication
+                      Get notified when it’s time to take your medication
                     </Text>
                   </View>
                 </View>

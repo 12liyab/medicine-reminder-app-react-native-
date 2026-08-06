@@ -24,7 +24,7 @@ import {
 } from "../utils/storage";
 import { useFocusEffect } from "@react-navigation/native";
 import {
-  registerForPushNotificationsAsync,
+  registerForNotificationsAsync,
   scheduleMedicationReminder,
 } from "../utils/notifications";
 
@@ -180,9 +180,9 @@ export default function HomeScreen() {
 
   const setupNotifications = async () => {
     try {
-      const token = await registerForPushNotificationsAsync();
-      if (!token) {
-        console.log("Failed to get push notification token");
+      const hasPermission = await registerForNotificationsAsync();
+      if (!hasPermission) {
+        console.log("Notification permission was not granted");
         return;
       }
 
@@ -304,7 +304,7 @@ export default function HomeScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Today's Schedule</Text>
+            <Text style={styles.sectionTitle}>Today’s Schedule</Text>
             <Link href="/calendar" asChild>
               <TouchableOpacity>
                 <Text style={styles.seeAllButton}>See All</Text>

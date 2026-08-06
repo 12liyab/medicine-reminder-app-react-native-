@@ -57,8 +57,8 @@ export default function CalendarScreen() {
   const { days, firstDay } = getDaysInMonth(selectedDate);
 
   const renderCalendar = () => {
-    const calendar: JSX.Element[] = [];
-    let week: JSX.Element[] = [];
+    const calendar: React.JSX.Element[] = [];
+    let week: React.JSX.Element[] = [];
 
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < firstDay; i++) {

@@ -3,8 +3,12 @@ import renderer from 'react-test-renderer';
 
 import { ThemedText } from '../ThemedText';
 
-it(`renders correctly`, () => {
-  const tree = renderer.create(<ThemedText>Snapshot test!</ThemedText>).toJSON();
+it(`renders correctly`, async () => {
+  let component!: ReturnType<typeof renderer.create>;
 
-  expect(tree).toMatchSnapshot();
+  await renderer.act(async () => {
+    component = renderer.create(<ThemedText>Snapshot test!</ThemedText>);
+  });
+
+  expect(component.toJSON()).toMatchSnapshot();
 });
