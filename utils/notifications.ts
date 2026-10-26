@@ -7,7 +7,7 @@ type NotificationsModule = typeof import("expo-notifications");
 const isExpoGo =
   Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
- notificationsModulePromise: Promise<NotificationsModule> | undefined;
+let notificationsModulePromise: Promise<NotificationsModule> | undefined;
 let notificationHandlerConfigured = false;
 
 async function getNotificationsAsync(): Promise<NotificationsModule | null> {
