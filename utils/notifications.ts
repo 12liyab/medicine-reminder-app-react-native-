@@ -2,7 +2,7 @@ import Constants, { ExecutionEnvironment } from "expo-constants";
 import { Platform } from "react-native";
 import { Medication } from "./storage";
 
- NotificationsModule = typeof import("expo-notifications");
+type NotificationsModule = typeof import("expo-notifications");
 
 const isExpoGo =
   Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
