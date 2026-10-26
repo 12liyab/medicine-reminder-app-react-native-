@@ -11,7 +11,7 @@ let notificationsModulePromise: Promise<NotificationsModule> | undefined;
 let notificationHandlerConfigured = false;
 
 async function getNotificationsAsync(): Promise<NotificationsModule | null> {
-   (isExpoGo) return null;
+  if (isExpoGo) return null;
 
   notificationsModulePromise ??= import("expo-notifications");
   const Notifications = await notificationsModulePromise;
